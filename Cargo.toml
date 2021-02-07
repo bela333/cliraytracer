@@ -1,0 +1,12 @@
+[package]
+name = "cliraytracer"
+version = "0.1.0"
+authors = ["bela333 <b3kstudio@gmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+terminal_size = "0.1.16"
+crossterm = "0.19.0"
+rand = "0.8.3"
