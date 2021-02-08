@@ -28,15 +28,18 @@ impl Sphere {
     }
     pub fn new(center: Vector3, radius: f32, value: f32) -> Self{
         Self{
-            center: center,
-            radius: radius,
-            value: value
+            center,
+            radius,
+            value
         }
     }
 }
 
 impl RayTracer {
     pub fn intersect(&self, r0: Vector3, rd: Vector3) -> Option<(&Sphere, f32)>{
-        return self.spheres.iter().map(|s|(s, s.intersect(r0, rd))).filter(|s|s.1 > 0f32).min_by(|a, b| a.1.partial_cmp(&b.1).unwrap_or(Ordering::Equal));
+        return self.spheres.iter()
+            .map(|s|(s, s.intersect(r0, rd))) //Associate each sphere with the ray distance
+            .filter(|s|s.1 > 0f32) //Filter out successful hits
+            .min_by(|a, b| a.1.partial_cmp(&b.1).unwrap_or(Ordering::Equal)); //Find closest hit
     }
 }

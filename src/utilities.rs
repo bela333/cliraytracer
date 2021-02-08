@@ -154,7 +154,7 @@ impl Vector3{
     pub fn reflect(&self, normal: Self) -> Self{
         let a = self.dot(normal);
         let p = self.multiply(1f32/a);
-        normal.multiply(2f32).subtract(p).normalized()
+        normal.multiply(2f32).subtract(p).normalized().multiply(a.signum())
     }
     pub fn comp_multiply(&self, a: Self) -> Self{
         Self::new(
@@ -210,6 +210,14 @@ impl Vector3{
             return Vector3::zero();
         }else{
             return self.multiply(eta).subtract(n.multiply(k.sqrt() + eta * self.dot(n)));
+        }
+    }
+
+    pub fn negate(&self) -> Self{
+        Self{
+            x: -self.x,
+            y: -self.y,
+            z: -self.z,
         }
     }
 }

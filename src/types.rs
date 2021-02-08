@@ -1,6 +1,6 @@
 use crate::raytracer::RayTracer;
 
-pub struct Parameters<'a>{
+pub struct Parameters{
     pub time: f32,
-    pub raytracer: &'a RayTracer
+    pub raytracer: RayTracer
 }

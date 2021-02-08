@@ -3,7 +3,7 @@ use std::{io::stdout, time::{Duration, Instant}, usize};
 
 use crossterm::{ExecutableCommand, cursor::{self}, terminal::{self}};
 use rand::Rng;
-use shader::{eval, get_raytracer};
+use shader::{eval, get_params};
 use terminal_size::{Height, Width, terminal_size};
 use types::Parameters;
 
@@ -13,13 +13,12 @@ mod utilities;
 mod raytracer;
 
 const PALETTE: &str = "$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\\|()1{}[]?-_+~<>i!lI;:,\"^`'. ";
-const FONT_ASPECT_RATIO: f32 = 12.0/16.0;
-//const FONT_ASPECT_RATIO: f32 = 9.0/19.0;
+const FONT_ASPECT_RATIO: f32 = 12.0/16.0;   //Aspect ratio of font. width/height. 0.5 seems to work well for anything other than windows command prompt
 const FRAMERATE: u64 = 60;
 
 
 fn draw(w: u16, h: u16, param: Parameters){
-    let mut rng = rand::thread_rng();
+    let mut rng = rand::thread_rng();   //RNG used for temporal dithering
     let range = 1f32 / (PALETTE.len()-1) as f32 / 2f32;
     let wf32 = w as f32;
     let hf32 = h as f32;
@@ -54,11 +53,7 @@ fn main() {
     loop {
         let time = t.elapsed().as_secs_f32();
         let frame_time = Instant::now();
-        let raytracer = get_raytracer(time);
-        let param = Parameters{
-            time,
-            raytracer: &raytracer
-        };
+        let param = get_params(time);
         stdout.execute(cursor::MoveTo(0, 0)).unwrap();
         draw(w, h, param);
         let elapsed = frame_time.elapsed();
