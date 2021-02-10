@@ -8,10 +8,17 @@ pub struct RayTracer{
     pub camera_pos: Vector3,
     pub camera_matrix: Matrix3
 }
+
+pub enum Types{
+    Diffuse,
+    Reflective
+}
+
 pub struct Sphere{
     pub center: Vector3,
     pub radius: f32,
-    pub value: f32
+    pub value: f32,
+    pub sphere_type: Types,
 }
 
 impl Sphere {
@@ -26,11 +33,12 @@ impl Sphere {
         }
         return (-b - ((b*b)-4f32*a*c).sqrt())/(2f32*a);
     }
-    pub fn new(center: Vector3, radius: f32, value: f32) -> Self{
+    pub fn new(center: Vector3, radius: f32, value: f32, sphere_type: Types) -> Self{
         Self{
             center,
             radius,
-            value
+            value,
+            sphere_type
         }
     }
 }
