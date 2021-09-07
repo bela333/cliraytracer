@@ -28,8 +28,8 @@ fn draw(w: u16, h: u16, param: &Parameters){
         let y = y as f32 / hf32;
         for x in 0..w {
             let x = x as f32 / wf32;
-            let val = 1f32-(eval(x, y, aspect_ratio, param) + rng.gen_range(-range..range)); //Mediocre try at temporal dithering
-            //let val = 1f32-(eval(x, y, aspect_ratio, param));
+            //let val = 1f32-(eval(x, y, aspect_ratio, param) + rng.gen_range(-range..range)); //Mediocre try at temporal dithering
+            let val = 1f32-(eval(x, y, aspect_ratio, param));
             let val = if val < 0f32 {0f32}else{val};
             let val = if val > 1f32 {1f32}else{val};
             let index = (val * (PALETTE.len()-1) as f32 + 0.5).floor() as usize;
