@@ -2,14 +2,9 @@ use crate::{raytracer::{RayTracer, Sphere}, types::Parameters, utilities::{Matri
 
 const EPSILON: f32 = 0.0001;
 
-pub fn get_params(time: f32) -> Parameters{
+pub fn get_params(time: f32, camera_pos: Vector3, direction: Matrix3) -> Parameters{
     let fanim = time*2.0;
-    let fcam = time;
 
-    let camera_pos = Vector3::new(
-        (fcam.sin())*10f32,
-        0f32,
-        (1.0-fcam.cos())*10f32);
 
     let raytracer = RayTracer{
         spheres: vec![
@@ -22,8 +17,7 @@ pub fn get_params(time: f32) -> Parameters{
             Sphere::new(Vector3::new(fanim.sin()*3.0, 0f32, 10f32+fanim.cos()*3.0), 1f32, 1f32),
         ],
         lamp: Vector3::new(1.0, 1.0, 0.0).multiply(10.0),
-        //look_at_matrix sets up a matrix where k points in the specified direction
-        camera_matrix: Matrix3::look_at_matrix(Vector3::new(0f32, 0.0, 10f32).subtract(camera_pos).normalized()), 
+        camera_matrix: direction,
         camera_pos,
     };
     Parameters{

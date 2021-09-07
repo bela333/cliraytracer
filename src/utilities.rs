@@ -220,13 +220,45 @@ impl Vector3{
             z: -self.z,
         }
     }
+
+    pub fn rotateX(self, angle: f32) -> Self{
+        let sin = angle.sin();
+        let cos = angle.cos();
+        let rotation_matrix = Matrix3::new(
+            Vector3::new(1.0, 0.0, 0.0),
+            Vector3::new(0.0, cos, sin),
+            Vector3::new(0.0, -sin, cos)
+        );
+        return rotation_matrix.multiply(self);
+    }
+    pub fn rotateY(self, angle: f32) -> Self{
+        let sin = angle.sin();
+        let cos = angle.cos();
+        let rotation_matrix = Matrix3::new(
+            Vector3::new(cos, 0.0, -sin),
+            Vector3::new(0.0, 1.0, 0.0),
+            Vector3::new(sin, 0.0, cos)
+        );
+        return rotation_matrix.multiply(self);
+    }
+    pub fn rotateZ(self, angle: f32) -> Self{
+        let sin = angle.sin();
+        let cos = angle.cos();
+        let rotation_matrix = Matrix3::new(
+            Vector3::new(cos, sin, 0.0),
+            Vector3::new(-sin, cos, 0.0),
+            Vector3::new(0.0, 0.0, 1.0)
+        );
+        return rotation_matrix.multiply(self);
+    }
 }
 
 
+#[derive(Clone, Copy)]
 pub struct Matrix3{
-    i: Vector3,
-    j: Vector3,
-    k: Vector3
+    pub i: Vector3,
+    pub j: Vector3,
+    pub k: Vector3
 }
 
 impl Matrix3{
@@ -246,6 +278,36 @@ impl Matrix3{
         let right = dir.cross(Vector3::new(0f32, 1f32, 0f32)).normalized().multiply(-1f32);
         let up = right.cross(dir).multiply(-1f32);
         Self::new(right, up, dir)
+    }
+
+    pub fn identity() -> Self{
+        Self::new(
+            Vector3::new(1.0, 0.0, 0.0),
+            Vector3::new(0.0, 1.0, 0.0),
+            Vector3::new(0.0, 0.0, 1.0)
+        )
+    }
+
+    pub fn rotateX(self, angle: f32) -> Self{
+        Self::new(
+            self.i.rotateX(angle),
+            self.j.rotateX(angle),
+            self.k.rotateX(angle),
+        )
+    }
+    pub fn rotateY(self, angle: f32) -> Self{
+        Self::new(
+            self.i.rotateY(angle),
+            self.j.rotateY(angle),
+            self.k.rotateY(angle),
+        )
+    }
+    pub fn rotateZ(self, angle: f32) -> Self{
+        Self::new(
+            self.i.rotateZ(angle),
+            self.j.rotateZ(angle),
+            self.k.rotateZ(angle),
+        )
     }
 }
 
