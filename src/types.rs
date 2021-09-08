@@ -1,6 +1,7 @@
-use crate::raytracer::RayTracer;
+use crate::{ray_resolvers::bvh::aabb::AABBRayResolver, raytracer::SceneInformation};
 
-pub struct Parameters{
+pub struct Parameters<'a>{
     pub time: f32,
-    pub raytracer: RayTracer
+    pub mesh: &'a AABBRayResolver,
+    pub sceneInformation: SceneInformation,
 }

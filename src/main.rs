@@ -3,6 +3,7 @@ use std::{f32::consts::PI, io::stdout, time::{Duration, Instant}, usize};
 
 use crossterm::{ExecutableCommand, cursor::{self}, event::{EnableMouseCapture, Event, KeyCode, poll, read}, style::Colorize, terminal::{self}};
 use rand::Rng;
+use ray_resolvers::bvh::generate_bvh_from_file;
 use shader::{eval, get_params};
 use terminal_size::{Height, Width, terminal_size};
 use types::Parameters;
@@ -12,6 +13,8 @@ mod shader;
 mod types;
 mod utilities;
 mod raytracer;
+mod ray_resolvers;
+mod error;
 
 const PALETTE: &str = "$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\\|()1{}[]?-+~<>i!lI;:`' ";
 const FONT_ASPECT_RATIO: f32 = 12.0/16.0;   //Aspect ratio of font. width/height. 0.5 seems to work well for anything other than windows command prompt
@@ -35,7 +38,7 @@ fn draw(w: u16, h: u16, param: &Parameters){
         for x in 0..w {
             let x_f32 = x as f32 / wf32;
             let dither_value = HALFTONE[x as usize%HALFTONE_SIZE][y as usize%HALFTONE_SIZE]-0.5;
-            let val = 1f32-(eval(x_f32, y_f32, aspect_ratio, param) + dither_value*range);
+            let val = (1f32-eval(x_f32, y_f32, aspect_ratio, param)) + dither_value*range;
             let val = if val < 0f32 {0f32}else{val};
             let val = if val > 1f32 {1f32}else{val};
             let index = (val * (PALETTE.len()-1) as f32 + 0.5).floor() as usize;
@@ -62,12 +65,13 @@ fn main() {
     let mut current_speed = Vector3::zero();
     let mut pitch = 0.0;
     let mut yaw = 0.0;
+    let mesh = generate_bvh_from_file("teapot.obj").unwrap();
     loop {
         let time = t.elapsed().as_secs_f32();
         let direction = Matrix3::identity();
         let direction = direction.rotateX(pitch);
         let direction = direction.rotateY(yaw);
-        let param = get_params(time, camera_pos, direction);
+        let param = get_params(time, camera_pos, direction, &mesh);
         stdout.execute(cursor::MoveTo(0, 0)).unwrap();
         let frame_time = Instant::now();
         draw(w, h, &param);
@@ -81,25 +85,25 @@ fn main() {
                         KeyCode::Char('w') => {
                             let mut d = direction.k;
                             d.y = 0.0;
-                            d = d.multiply(SPEED);
+                            d = d.normalized().multiply(SPEED);
                             target_speed = d;
                         },
                         KeyCode::Char('s') => {
                             let mut d = direction.k;
                             d.y = 0.0;
-                            d = d.multiply(SPEED);
+                            d = d.normalized().multiply(SPEED);
                             target_speed = d.negate();
                         },
                         KeyCode::Char('a') => {
                             let mut d = direction.i;
                             d.y = 0.0;
-                            d = d.multiply(SPEED);
+                            d = d.normalized().multiply(SPEED);
                             target_speed = d.negate();
                         },
                         KeyCode::Char('d') => {
                             let mut d = direction.i;
                             d.y = 0.0;
-                            d = d.multiply(SPEED);
+                            d = d.normalized().multiply(SPEED);
                             target_speed = d;
                         },
                         _ => ()

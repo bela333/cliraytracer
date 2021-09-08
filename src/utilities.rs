@@ -5,6 +5,7 @@ pub struct Vector3{
     pub z: f32,
 }
 
+#[derive(Clone, Copy)]
 pub enum Components{
     X, Y, Z
 }
@@ -250,6 +251,26 @@ impl Vector3{
             Vector3::new(0.0, 0.0, 1.0)
         );
         return rotation_matrix.multiply(self);
+    }
+
+    pub fn reciprocal(&self) -> Self {
+        Self {
+            x: 1.0 / self.x,
+            y: 1.0 / self.y,
+            z: 1.0 / self.z,
+        }
+    }
+
+    pub fn from_slice(a: &[f32]) -> Self {
+        Self::new(a[0], a[1], a[2])
+    }
+
+    pub fn get_component(&self, component: Components) -> f32 {
+        match component {
+            Components::X => self.x,
+            Components::Y => self.y,
+            Components::Z => self.z,
+        }
     }
 }
 
