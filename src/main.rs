@@ -13,23 +13,29 @@ mod types;
 mod utilities;
 mod raytracer;
 
-const PALETTE: &str = "$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\\|()1{}[]?-_+~<>i!lI;:,\"^`'. ";
+const PALETTE: &str = "$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\\|()1{}[]?-+~<>i!lI;:`' ";
 const FONT_ASPECT_RATIO: f32 = 12.0/16.0;   //Aspect ratio of font. width/height. 0.5 seems to work well for anything other than windows command prompt
 const FRAMERATE: u64 = 60;
 
+const HALFTONE_SIZE: usize = 4;
+const HALFTONE: [[f32; HALFTONE_SIZE]; HALFTONE_SIZE] = [
+    [0.0/15.0, 8.0/15.0, 2.0/15.0, 10.0/15.0],
+    [12.0/15.0, 4.0/15.0, 14.0/15.0, 6.0/15.0],
+    [3.0/15.0, 11.0/15.0, 1.0/15.0, 9.0/15.0],
+    [15.0/15.0, 7.0/15.0, 13.0/15.0, 5.0/15.0],
+];
 
 fn draw(w: u16, h: u16, param: &Parameters){
-    let mut rng = rand::thread_rng();   //RNG used for temporal dithering
     let range = 1f32 / (PALETTE.len()-1) as f32 / 2f32;
     let wf32 = w as f32;
     let hf32 = h as f32;
     let aspect_ratio = wf32 / (hf32 / FONT_ASPECT_RATIO);
     for y in 0..h {
-        let y = y as f32 / hf32;
+        let y_f32 = y as f32 / hf32;
         for x in 0..w {
-            let x = x as f32 / wf32;
-            //let val = 1f32-(eval(x, y, aspect_ratio, param) + rng.gen_range(-range..range)); //Mediocre try at temporal dithering
-            let val = 1f32-(eval(x, y, aspect_ratio, param));
+            let x_f32 = x as f32 / wf32;
+            let dither_value = HALFTONE[x as usize%HALFTONE_SIZE][y as usize%HALFTONE_SIZE]-0.5;
+            let val = 1f32-(eval(x_f32, y_f32, aspect_ratio, param) + dither_value*range);
             let val = if val < 0f32 {0f32}else{val};
             let val = if val > 1f32 {1f32}else{val};
             let index = (val * (PALETTE.len()-1) as f32 + 0.5).floor() as usize;
