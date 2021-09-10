@@ -1,7 +1,7 @@
 
 use std::{f32::consts::PI, io::stdout, time::{Duration, Instant}, usize};
 
-use crossterm::{ExecutableCommand, cursor::{self}, event::{EnableMouseCapture, Event, KeyCode, poll, read}, style::Colorize, terminal::{self}};
+use crossterm::{ExecutableCommand, cursor::{self}, event::{EnableMouseCapture, Event, KeyCode, KeyModifiers, poll, read}, style::Colorize, terminal::{self}};
 use rand::Rng;
 use ray_resolvers::bvh::generate_bvh_from_file;
 use shader::{eval, get_params};
@@ -16,8 +16,8 @@ mod raytracer;
 mod ray_resolvers;
 mod error;
 
-const PALETTE: &str = "$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\\|()1{}[]?-+~<>i!lI;:`' ";
-const FONT_ASPECT_RATIO: f32 = 12.0/16.0;   //Aspect ratio of font. width/height. 0.5 seems to work well for anything other than windows command prompt
+const PALETTE: &str = "@&%QWNM0gB$#DR8mHXKAbUGOpV4d9h6PqkwSE2]ayjxY5Zeonu[l1t3If}C{Fi|(7J)vTLsz?:/*cr!+<>;\"=~^,_:'-.` ";
+const FONT_ASPECT_RATIO: f32 = 8.0/16.0;   //Aspect ratio of font. width/height. 0.5 seems to work well for anything other than windows command prompt
 const FRAMERATE: u64 = 60;
 
 const HALFTONE_SIZE: usize = 4;
@@ -66,6 +66,7 @@ fn main() {
     let mut pitch = 0.0;
     let mut yaw = 0.0;
     let mesh = generate_bvh_from_file("teapot.obj").unwrap();
+    let mut crouch = false;
     loop {
         let time = t.elapsed().as_secs_f32();
         let direction = Matrix3::identity();
@@ -76,7 +77,7 @@ fn main() {
         let frame_time = Instant::now();
         draw(w, h, &param);
         let elapsed = frame_time.elapsed();
-        const SPEED: f32 = 2.0;
+        const SPEED: f32 = 1.0;
         let mut target_speed = Vector3::zero();
         while poll(Duration::ZERO).unwrap() {
             match read().unwrap() {
@@ -106,6 +107,13 @@ fn main() {
                             d = d.normalized().multiply(SPEED);
                             target_speed = d;
                         },
+                        KeyCode::Char('c') => {
+                            camera_pos.y = match crouch {
+                                true => -0.5,
+                                false => 0.0,
+                            };
+                            crouch = !crouch;
+                        }
                         _ => ()
                     }
                 }
@@ -121,7 +129,7 @@ fn main() {
                 _ => (),
             }
         }
-        const CURVE: f32 = 0.1;
+        const CURVE: f32 = 0.5;
         current_speed = target_speed.multiply(CURVE).add(current_speed.multiply(1.0-CURVE));
         camera_pos = camera_pos.add(current_speed);
         if elapsed < target_frame_time {

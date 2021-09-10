@@ -35,7 +35,7 @@ pub fn eval(x: f32, y: f32, aspect_ratio: f32, param: &Parameters) -> f32{
         let lamp_dir = lamp_dir.normalized(); //Make the lamp direction normalized
 
         
-        let ambient = 0.005;
+        let ambient = 0.000;
         
         let diffuse = {
             let ray_start = hit.add(normal.multiply(EPSILON)); //Send shadow ray from above the surface of the sphere
